@@ -16,23 +16,32 @@ module.exports = {
     var pw = req.body.pw;
     var bee = require('bcrypt');
 
-    User.findOne({name: nm}).exec(function(err, user) {
-      if(err){
-        return;
-      }
+    if(nm && pw){
 
-      bee.compare(pw, user.password, function(err, matches) {
-          // matches === true
+      User.findOne({name: nm}).exec(function(err, user) {
+        if(err){
+          return;
+        }
 
-          if(matches === true){
-            return res.view('homepage');
-          } else {
-            return res.view('login', {error: 'Invalid Credentials'});
-          }
+        bee.compare(pw, user.password, function(err, matches) {
+            // matches === true
+
+            if(matches === true){
+
+              // get tokenlib and then generate new token for this user
+              var tokenlib = require('hash-auth-token')( process.env.DARKROOM_SECRET );
+              var token = tokenlib.generate({user: nm}, 3600);
+
+              return res.cookie('authed', token, {signed: true}).view('homepage');
+            } else {
+              return res.view('login', {error: 'Invalid Credentials'});
+            }
+        });
+
       });
-
-    });
+    }
     
   }
 };
 
+// res.cookie(name, value [,options]);
