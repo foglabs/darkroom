@@ -32,9 +32,11 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  'get /': 'ThoughtController.homepage',
+  'get /': 'ThoughtController.index',
   'get /login': 'UserController.login',
   'post /auth': 'UserController.auth',
+
+
 
   /***************************************************************************
   *                                                                          *

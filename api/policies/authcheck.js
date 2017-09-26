@@ -2,8 +2,20 @@ module.exports = function authcheck(req, res, next){
   var au = req.signedCookies.authed;
   if(au){
     var tokenlib = require('hash-auth-token')(process.env.DARKROOM_SECRET);
-    var userObj = tokenlib.verify(au);
+
+    try{
+      var userdata = tokenlib.verify(au);
+    }
+    catch(e){
+
+      if(!userdata){
+        return res.redirect('/login');
+      }  
+    }
+    
+  } else {
+    return res.redirect('/login');
   }
 
-  next();
+  return next();
 }

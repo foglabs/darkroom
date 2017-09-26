@@ -50,7 +50,7 @@ module.exports.policies = {
 	// }
 
   ThoughtController: {
-    '*': authcheck,
+    '*': 'authcheck',
   }
 
 };
