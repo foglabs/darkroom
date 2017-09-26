@@ -15,6 +15,10 @@ module.exports = {
     password: {
       type: 'text'
     },
+    secret: {
+      type: 'text',
+      unique: true
+    },
     pic: {
       type: 'text'
     },

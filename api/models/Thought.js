@@ -8,7 +8,13 @@
 module.exports = {
 
   attributes: {
-    
+    body: {
+      type: 'text',
+      required: true
+    },
+    identity: {
+      type: 'text',
+      required: true,
+    }    
   }
 };
-

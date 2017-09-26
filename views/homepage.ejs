@@ -1,1 +1,11 @@
-LOOKIT YOU YOU DID IT
+<form id="new-thought" action="/create" method="post">
+  <input type="text" name="bo">
+  <input type="submit" value="Create">
+</form>
+
+<% for(var i=0; i<thoughts.length; i++) { %>
+  <span class="bl b_purple W20 white left" id="<%= thoughts[i].id %>">
+    Msg:<%= thoughts[i].body %>
+  </span>
+  <span style="min-height: 0.4em; float: left;"></span>
+<% } %>

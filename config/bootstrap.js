@@ -20,7 +20,7 @@ module.exports.bootstrap = function(cb) {
   User.destroy({}).exec(function(){});
 
   require('bcrypt').hash('bigolbutt', 10000, function(err, hash) {
-    User.findOrCreate({name: 'fog', password: hash}).exec(function(err, res){
+    User.findOrCreate({name: 'fog', password: hash, secret: 'voodoo' }).exec(function(err, res){
       return;
     });
   });

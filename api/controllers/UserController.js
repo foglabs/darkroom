@@ -24,18 +24,25 @@ module.exports = {
         }
 
         bee.compare(pw, user.password, function(err, matches) {
-            // matches === true
+          if(matches === true){
 
-            if(matches === true){
+            // get tokenlib and then generate new token for this user
+            var tokenlib = require('hash-auth-token')( process.env.DARKROOM_SECRET );
 
-              // get tokenlib and then generate new token for this user
-              var tokenlib = require('hash-auth-token')( process.env.DARKROOM_SECRET );
-              var token = tokenlib.generate({user: nm}, 3600);
+            // user login token (user id)
+            var usertoken = tokenlib.generate({userid: user.id}, 3600);
 
-              return res.cookie('authed', token, {signed: true}).view('homepage');
-            } else {
-              return res.view('login', {error: 'Invalid Credentials'});
-            }
+            // recreate encrypted identity with user's secret
+            var ident = require('crypto-js').AES.encrypt(user.secret, process.env.DARKROOM_SECRET).toString();
+            req.session.identity = ident;
+
+            // who we is
+            req.session.userid = user.id;
+
+            return res.cookie('authed', usertoken, {signed: true}).redirect('/');
+          } else {
+            return res.view('login', {error: 'Invalid Credentials'});
+          }
         });
 
       });
@@ -45,3 +52,20 @@ module.exports = {
 };
 
 // res.cookie(name, value [,options]);
+
+// other option for carrying ident
+// .cookie('identity', ident, {signed: true})
+
+
+
+
+// var CryptoJS = require("crypto-js");
+ 
+// // Encrypt 
+// var ciphertext = CryptoJS.AES.encrypt('my message', 'secret key 123');
+ 
+// // Decrypt 
+// var bytes  = CryptoJS.AES.decrypt(ciphertext.toString(), 'secret key 123');
+// var plaintext = bytes.toString(CryptoJS.enc.Utf8);
+ 
+// console.log(plaintext);
