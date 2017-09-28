@@ -1,0 +1,23 @@
+<span class="W50 left bl">
+  They Requested
+  <% for(var i=0; i<they_requested.length; i++) { %>
+
+    <span class="b_purple white">
+      From: <%= they_requested[i].asker.name %>
+      Re: <%= they_requested[i].thought.body %>
+    </span>
+
+  <% } %>
+</span>
+
+<span class="W50 left bl">
+  I Requested
+  <% for(var i=0; i<i_requested.length; i++) { %>
+
+    <span class="b_purple white">
+      From: Me
+      Re: <%= i_requested[i].body %>
+    </span>
+
+  <% } %>
+</span>

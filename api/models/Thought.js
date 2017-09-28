@@ -12,9 +12,18 @@ module.exports = {
       type: 'text',
       required: true
     },
+    // this is the revealable user data
+    mystery: {
+      type: 'text',
+      required: true,
+    },
+    // this is how we identify the logged-in user's posts
     identity: {
       type: 'text',
       required: true,
-    }    
+    },
+    rating: {
+      type: 'integer',
+    }
   }
 };

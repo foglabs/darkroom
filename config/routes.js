@@ -34,10 +34,14 @@ module.exports.routes = {
 
   'get /': 'ThoughtController.index',
   'post /create': 'ThoughtController.create',
+  'post /rating': 'ThoughtController.rating',
+  'post /request': 'ThoughtController.request',
+  'get /requests': 'ThoughtController.requests',
 
 
   'get /login': 'UserController.login',
   'post /auth': 'UserController.auth',
+  'get /logout': 'UserController.logout',
 
 
 

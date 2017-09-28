@@ -20,26 +20,34 @@ module.exports = {
 
       User.findOne({name: nm}).exec(function(err, user) {
         if(err){
-          return;
+          return res.redirect('/');
         }
+
+        console.log(user)
 
         bee.compare(pw, user.password, function(err, matches) {
           if(matches === true){
 
-            // get tokenlib and then generate new token for this user
             var tokenlib = require('hash-auth-token')( process.env.DARKROOM_SECRET );
 
             // user login token (user id)
             var usertoken = tokenlib.generate({userid: user.id}, 3600);
 
-            // recreate encrypted identity with user's secret
-            var ident = require('crypto-js').AES.encrypt(user.secret, process.env.DARKROOM_SECRET).toString();
-            req.session.identity = ident;
+            var hashme = user.identity + ':' + process.env.IDENTITY_SECRET;
 
-            // who we is
-            req.session.userid = user.id;
+            var decrypted_salt = require('crypto-js').AES.decrypt(user.ident_salt, process.env.DARKROOM_SECRET).toString(); 
 
-            return res.cookie('authed', usertoken, {signed: true}).redirect('/');
+            bee.hash(hashme, decrypted_salt, function(err, identhash) {
+              
+              // recreate my hot hash
+              req.session.identity = identhash;
+
+              // who we is
+              req.session.userid = user.id;
+
+              return res.cookie('authed', usertoken, {signed: true}).redirect('/');
+            });
+
           } else {
             return res.view('login', {error: 'Invalid Credentials'});
           }
@@ -48,6 +56,11 @@ module.exports = {
       });
     }
     
+  },
+
+  logout: function(req, res) {
+    req.session.destroy();
+    return res.clearCookie('authed').redirect('/login');
   }
 };
 

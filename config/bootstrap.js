@@ -17,13 +17,41 @@ module.exports.bootstrap = function(cb) {
 
   // album
 
-  User.destroy({}).exec(function(){});
+  if(true){
+    Thought.destroy({}).exec(function(){});
+    User.destroy({}).exec(function(){});
 
-  require('bcrypt').hash('bigolbutt', 10000, function(err, hash) {
-    User.findOrCreate({name: 'fog', password: hash, secret: 'voodoo' }).exec(function(err, res){
-      return;
+    var bcrypt = require('bcrypt');
+
+    // generate password hash
+    bcrypt.hash('bigolbutt', 2, function(err, hash) {
+
+      // bcrypt.genSalt(10, function(err, salt) {
+      //     bcrypt.hash("", salt, function(err, hash) {
+      //         // Store hash in your password DB. 
+      //     });
+      // });
+      
+      // store salt for identity usage!
+      bcrypt.genSalt(2, function(err, salt) {
+        
+        // encrypt for secretecy!
+        var crypted_salt = require('crypto-js').AES.encrypt(salt, process.env.DARKROOM_SECRET).toString();
+
+        // generate random identity
+        var sodium = require('sodium');
+        var ident1 = sodium.api.randombytes_uniform(1000000000).toString(32);
+        var ident2 = sodium.api.randombytes_uniform(1000000000).toString(32);
+        var ident3 = sodium.api.randombytes_uniform(1000000000).toString(32);
+        var ident = ident1+ident2+ident3;
+
+        User.findOrCreate({name: 'fog', password: hash, identity_salt: crypted_salt, secret: 'voodoo', identity: ident}).exec(function(err, res){
+          return;
+        });
+      });
+
     });
-  });
+  }
   
 
   cb();

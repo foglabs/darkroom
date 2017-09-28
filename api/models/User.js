@@ -13,12 +13,28 @@ module.exports = {
       unique: true
     },
     password: {
-      type: 'text'
+      type: 'text',
+      unique: true
     },
     secret: {
       type: 'text',
       unique: true
     },
+    identity: {
+      type: 'text',
+      unique: true
+    },
+    identity_salt: {
+      type: 'text'
+    },
+
+
+
+    dope: {
+      type: 'integer',
+      default: 1
+    },
+
     pic: {
       type: 'text'
     },

@@ -1,11 +1,21 @@
-<form id="new-thought" action="/create" method="post">
-  <input type="text" name="bo">
-  <input type="submit" value="Create">
-</form>
+<span class="W100 left bl">
+  <form id="new-thought" action="/create" method="post">
+    <input type="text" name="bo">
+    <input type="submit" value="Create">
+  </form>
 
-<% for(var i=0; i<thoughts.length; i++) { %>
-  <span class="bl b_purple W20 white left" id="<%= thoughts[i].id %>">
-    Msg:<%= thoughts[i].body %>
-  </span>
-  <span style="min-height: 0.4em; float: left;"></span>
-<% } %>
+  <a href="/logout">Logout</a>
+</span>
+
+<span class="W100 left bl">
+  <% for(var i=0; i<thoughts.length; i++) { %>
+    <span class="bl b_purple W20 white left <% if(thoughts[i].mine) {  %>red<% } %>" id="<%= thoughts[i].id %>">
+      <%= thoughts[i].body %>
+      <span class="rating"><%= thoughts[i].rating %></span>
+      <button class="plus">+</button>
+      <button class="minus">-</button>
+      <button class="request">?</button>
+    </span>
+    <span style="min-height: 0.4em; float: left;"></span>
+  <% } %>
+</span>
