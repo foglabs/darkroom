@@ -34,8 +34,12 @@ module.exports = {
             var usertoken = tokenlib.generate({userid: user.id}, 3600);
 
             var hashme = user.identity + ':' + process.env.IDENTITY_SECRET;
+            
+            var CryptoJS = require('crypto-js');
+            
+            var decrypted_salt = CryptoJS.AES.decrypt(user.identity_salt, process.env.DARKROOM_SECRET).toString(CryptoJS.enc.Utf8); 
 
-            var decrypted_salt = require('crypto-js').AES.decrypt(user.ident_salt, process.env.DARKROOM_SECRET).toString(); 
+            console.log(decrypted_salt)
 
             bee.hash(hashme, decrypted_salt, function(err, identhash) {
               

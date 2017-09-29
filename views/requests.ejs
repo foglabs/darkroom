@@ -1,23 +1,30 @@
-<span class="W50 left bl">
-  They Requested
-  <% for(var i=0; i<they_requested.length; i++) { %>
+<span class="W100 left bl">
+  <span class="W50 left bl">
+    
+    <span class="left bl W100">They Requested</span>
 
-    <span class="b_purple white">
-      From: <%= they_requested[i].asker.name %>
-      Re: <%= they_requested[i].thought.body %>
-    </span>
+    <% for(var i=0; i<they_requested.length; i++) { %>
 
-  <% } %>
-</span>
+      <span id="<%= they_requested[i].id %>" class="b_purple white square left bl bord_white">
+        From: <%= they_requested[i].asker.name %>
+        Re: <%= they_requested[i].thought.body %>
+        <button class="accept" id="<%= they_requested[i].id %>">Accept</button>
+      </span>
 
-<span class="W50 left bl">
-  I Requested
-  <% for(var i=0; i<i_requested.length; i++) { %>
+    <% } %>
+  </span>
 
-    <span class="b_purple white">
-      From: Me
-      Re: <%= i_requested[i].body %>
-    </span>
+  <span class="W50 left bl">
+    
+    <span class="left bl W100">I Requested</span>
 
-  <% } %>
+    <% for(var i=0; i<i_requested.length; i++) { %>
+
+      <span class="b_purple white square left bl bord_white">
+        From: Me
+        Re: <%= i_requested[i].body %>
+      </span>
+
+    <% } %>
+  </span>
 </span>

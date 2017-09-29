@@ -37,6 +37,27 @@
   </head>
 
   <body>
+    <span class="W100 left bl">
+      <span class="W20 left bl">
+
+        <form id="new-thought" action="/create" method="post">
+          <input type="text" name="bo">
+          <input type="submit" value="Create">
+        </form>
+      </span>
+
+      <span class="W20 left bl">
+        <a href="/requests">Requests</a>
+      </span>
+
+      <span class="W20 left bl">
+        <a href="/harmonies">Harmonies</a>
+      </span>
+
+      <span class="W20 left bl">
+        <a href="/logout">Logout</a>
+      </span>
+    </span>
     <%- body %>
 
 
@@ -94,6 +115,7 @@
     <script src="/js/dependencies/sails.io.js"></script>
     <script src="/js/homepage.js"></script>
     <script src="/js/jquery-2.2.0.min.js"></script>
+    <script src="/js/requests.js"></script>
     <!--SCRIPTS END-->
   </body>
 </html>

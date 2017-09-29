@@ -2,6 +2,14 @@ body {
   font-family: 'Lato', sans-serif;
 }
 
+.square {
+  margin: -1px;
+  max-width: 20%;
+  min-width: 20%;
+  width: 20%;
+  height: 3em;
+}
+
 .bl {
   display: block;
 }
@@ -36,10 +44,21 @@ body {
   background-color: #000000;
 }
 
+.b_red {
+  color: #DD0022;
+}
+
+.b_green {
+  color: #11CC00;
+}
+
 .white {
   color: #FFFFFF;
 }
 
 .red {
   color: #FF0000;
+}
+.bord_white {
+  border: 1px solid #FFFFFF;
 }

@@ -37,6 +37,8 @@ module.exports.routes = {
   'post /rating': 'ThoughtController.rating',
   'post /request': 'ThoughtController.request',
   'get /requests': 'ThoughtController.requests',
+  'post /accept': 'ThoughtController.accept',
+  'get /harmonies': 'ThoughtController.harmonies',
 
 
   'get /login': 'UserController.login',

@@ -2,9 +2,9 @@ $(document).ready(function() {
   $('.plus, .minus, .request').click(function() {
     var dis = $(this);
 
-    if(dis.hasClass('request')) {
+    if( dis.hasClass('request') ) {
       
-      $.post('/request', { id: dis.parent().attr('id'),  }, function(err, resp) {
+      $.post('/request', { id: dis.parent().parent().attr('id'),  }, function(err, resp) {
         console.log(resp)
       });
 
@@ -15,7 +15,7 @@ $(document).ready(function() {
       var val = -1;
     }
 
-    $.post('/rating', { id: dis.parent().attr('id'), val: val }, function(err, resp) {
+    $.post('/rating', { id: dis.parent().parent().attr('id'), val: val }, function(err, resp) {
       console.log(resp)
     });
   });

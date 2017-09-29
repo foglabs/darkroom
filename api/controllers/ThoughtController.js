@@ -8,22 +8,48 @@
 module.exports = {
   index: function(req, res) {
 
-    Thought.find({}, function(err, tho) {
+    Harmony.find({owner: req.session.userid }).populate('friend').exec(function(err, harmonies) {
       if(err){
         return;
       }
 
-      thoughts = [];
-
-      for(var i=0; i<tho.length; i++){
-        thoughts[i] = tho[i];
-
-        // is it mine
-        thoughts[i].mine = tho[i].identity === req.session.identity;
+      thought_identities = [];
+      for(var i=0; i<harmonies.length; i++){
+        thought_identities.push(harmonies[i].friend_identity);
       }
-      console.log(thoughts)
-      return res.view('homepage', {thoughts: thoughts});
+
+
+      Thought.find({}, function(err, tho) {
+        if(err){
+          return;
+        }
+
+        thoughts = [];
+
+        for(var i=0; i<tho.length; i++){
+          thoughts[i] = tho[i];
+
+          // is it mine
+          thoughts[i].mine = tho[i].identity === req.session.identity;
+
+          var is_friend = thought_identities.indexOf(tho[i].identity);
+
+          console.log(harmonies)
+
+          if(is_friend>-1){
+            thoughts[i].friend = harmonies[is_friend].friend;
+          } else {
+            thoughts[i].friend = null;
+          }
+        }
+
+
+
+        // console.log(thoughts)
+        return res.view('homepage', {thoughts: thoughts});
+      });
     });
+
   },
 
   create: function(req, res) {
@@ -32,6 +58,9 @@ module.exports = {
     var id = req.session.identity;
     var userid = req.session.userid;
     var bee = require('bcrypt');
+
+    console.log(req.session.identity)
+    console.log(req.session.userid)
 
     if(!id || !userid){
       // , {error: 'Missing Identity'}
@@ -74,7 +103,8 @@ module.exports = {
         return res.clearCookie('authed').redirect('/login');
       }
     
-      Request.find({$and: [{askee: use.id}, {asker: use.id} ]}).populate('thought').exec(function(err, reqqys)  {
+      console.log(use)
+      Request.find({$or: [{askee: use.id}, {asker: use.id} ]}).populate('asker').populate('askee').populate('thought').exec(function(err, reqqys)  {
         if(err){
           return;
         }
@@ -84,10 +114,10 @@ module.exports = {
 
         for(var i=0; i<reqqys.length; i++){
 
-          if(reqqys[i].asker == use.id){
+          if(reqqys[i].asker.id == use.id){
 
             i_requested.push(reqqys[i].thought);
-          } else if(reqqys[i].askee == use.id) {
+          } else if(reqqys[i].askee.id == use.id) {
             
             they_requested.push(reqqys[i]);
           }
@@ -97,6 +127,33 @@ module.exports = {
       });
 
     });
+  },
+
+  accept: function(req, res) {
+    Request.findOne({id: req.body.id}).populate('asker').populate('askee').populate('thought').exec(function(err, reqqy) {
+
+      if(err){
+        return;
+      }
+
+      console.log(reqqy)
+
+      Harmony.create([{owner: reqqy.asker.id, friend: req.session.userid, friend_identity: req.session.identity}, {owner: req.session.userid, friend: reqqy.asker.id, friend_identity: reqqy.thought.identity}]).exec(function(err, harms) {
+        if(err){
+          return;
+        }
+
+        console.log(harms)
+
+        Request.destroy({$or: [{askee: req.session.userid, asker: reqqy.asker.id}, {askee: reqqy.asker.id, asker: req.session.userid} ]}).populate('asker').populate('askee').populate('thought').exec(function(err, reqdestroy) {
+          console.log('destroyed!')
+          res.redirect('/');
+        });
+
+      });
+
+    });
+
   },
 
   request: function(req, res) {
@@ -115,8 +172,10 @@ module.exports = {
           return res.clearCookie('authed').redirect('/login');
         }
       
-        var decrypto = require('crypto-js').AES.decrypt(tho.mystery, process.env.DARKROOM_SECRET).toString(); 
+        var CryptoJS = require('crypto-js');
+        var decrypto = CryptoJS.AES.decrypt(tho.mystery, process.env.DARKROOM_SECRET).toString(CryptoJS.enc.Utf8); 
 
+        console.log(decrypto)
         User.findOne({secret: decrypto}, function(err, user) {
           if(err){
             return;
@@ -127,13 +186,24 @@ module.exports = {
             return res.clearCookie('authed').redirect('/login');
           }
 
-          Request.create({asker: use.id, askee: user.id, thought: tho.id}, function(err, reqqy) {
-            if(err){
-              return res.send(400, "Boo Not Cool");
+
+          Harmony.count({owner: req.session.userid, friend: friend.id}, function(err, count) {
+            if(count==0){
+
+              Request.create({asker: use.id, askee: friend.id, thought: tho.id}, function(err, reqqy) {
+                console.log(reqqy)
+                if(err){
+                  return res.send(400, "Boo Not Cool");
+                } else {
+                  return res.send(200, "Cool");
+                }
+              });
+
             } else {
-              return res.send(200, "Cool");
+              return res.send(200, "Already Friends!");
             }
           });
+          
         });
 
       });
@@ -152,7 +222,9 @@ module.exports = {
           return;
         }
 
-        tho.rating += (val*use.dope);
+        console.log(req.body)
+
+        tho.rating += (parseInt(req.body.val)*use.dope);
         tho.save();
 
         return res.send(200, "Cool");
@@ -162,7 +234,14 @@ module.exports = {
     });
   },
 
-  confirm: function(req, res) {
+  harmonies: function(req, res) {
+    Harmony.find({owner: req.session.userid}).populate('friend').populate('owner').exec(function(err, harms) {
+      if(err){
+        return;
+      }
+
+      return res.view('harmonies', {harmonies: harms});
+    });
     // check secret... create harmony, destroy request
   }
 };

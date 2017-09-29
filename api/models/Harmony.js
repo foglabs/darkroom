@@ -8,12 +8,17 @@
 module.exports = {
 
   attributes: {
-    owner_id: {
-      type: 'text'
+    owner: {
+      model: 'user'
     },
-    friend_id: {
+    friend: {
+      model: 'user'
+    },
+
+    friend_identity: {
       type: 'text'
-    },    
+    }
+
   }
 };
 
