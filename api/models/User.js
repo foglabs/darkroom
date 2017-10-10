@@ -28,11 +28,8 @@ module.exports = {
       type: 'text'
     },
 
-
-
     dope: {
       type: 'integer',
-      default: 1
     },
 
     pic: {

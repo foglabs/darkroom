@@ -1,14 +1,14 @@
 <span class="W100 left bl">
   <span class="W50 left bl">
     
-    <span class="left bl W100">They Requested</span>
+    <span class="left bl W100 b_purple white bord_white P2">They Requested</span>
 
-    <% for(var i=0; i<they_requested.length; i++) { %>
+    <% for(var i=0; i<to_me.length; i++) { %>
 
-      <span id="<%= they_requested[i].id %>" class="b_purple white square left bl bord_white">
-        From: <%= they_requested[i].asker.name %>
-        Re: <%= they_requested[i].thought.body %>
-        <button class="accept" id="<%= they_requested[i].id %>">Accept</button>
+      <span id="<%= to_me[i].id %>" class="b_purple white square left bl bord_white P2">
+        From: <%= to_me[i].asker.name %>
+        Re: <%= to_me[i].thought.body %>
+        <button class="accept" id="<%= to_me[i].id %>">Accept</button>
       </span>
 
     <% } %>
@@ -16,13 +16,13 @@
 
   <span class="W50 left bl">
     
-    <span class="left bl W100">I Requested</span>
+    <span class="left bl W100 b_purple white bord_white P2">I Requested</span>
 
-    <% for(var i=0; i<i_requested.length; i++) { %>
+    <% for(var i=0; i<from_me.length; i++) { %>
 
-      <span class="b_purple white square left bl bord_white">
+      <span class="b_purple white square left bl bord_white P2">
         From: Me
-        Re: <%= i_requested[i].body %>
+        Re: <%= from_me[i].body %>
       </span>
 
     <% } %>

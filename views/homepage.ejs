@@ -2,21 +2,27 @@
 
 <span class="W100 left bl">
   <% for(var i=0; i<thoughts.length; i++) { %>
-    <span class="bl b_purple square bord_white white left <% if(thoughts[i].mine) {  %>red<% } %>" id="<%= thoughts[i].id %>">
-      <%= thoughts[i].body %>
-      <span class="rating"><%= thoughts[i].rating %></span>
-  
-      <span class="W100 left bl">    
+    <span class="bl b_purple square bord_white white left" id="<%= thoughts[i].id %>">
+      
+      <% if(thoughts[i].friend) {  %>
+        <span class="W96 left bl b_black P2 white"><%= thoughts[i].friend.name %></span>
+
+      <% } else if(thoughts[i].mine) { %>
+        <span class="W96 left bl b_black P2 white">Me</span>
+      <% } %>
+      
+      <span class="W96 left bl black P2 b_white">
+        <%= thoughts[i].body %>
+      </span>
+
+      <span class="W96 left bl P2">    
         <% if(!thoughts[i].mine) {  %>
           <button class="plus">+</button>
           <button class="minus">-</button>
           <button class="request">?</button>
         <% } %>
 
-        <% if(thoughts[i].friend) {  %>
-          <%= thoughts[i].friend.name %> is yo friend
-        <% } %>
-
+        <span class="rating"><%= thoughts[i].rating %></span>
       </span>
 
     </span>

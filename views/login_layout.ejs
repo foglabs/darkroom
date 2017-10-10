@@ -32,40 +32,11 @@
     <link rel="stylesheet" href="/styles/importer.css">
     <link rel="stylesheet" href="/styles/stylo.css">
     <!--STYLES END-->
+
+    <script src="/js/jquery-2.2.0.min.js"></script>
   </head>
 
-  <body class="b_dpurple">
-    <span class="W100 left bl H3">
-      <span class="W16 left bl">
-
-        <form id="new-thought" action="/create" method="post">
-          <input type="text" name="bo" id="creation">
-          <input type="submit" value="Create">
-        </form>
-      </span>
-
-
-      <span class="W16 b_black left bl">
-        <a class="white W100 bord_white H3 bl" href="/">Home</a>
-      </span>
-
-      <span class="W16 b_black left bl">
-        <a class="white W100 bord_white H3 bl" href="/requests">Requests</a>
-      </span>
-
-      <span class="W16 b_black left bl">
-        <a class="white W100 bord_white H3 bl" href="/harmonies">Harmonies</a>
-      </span>
-
-      <span class="W16 b_black left bl">
-        <a class="white W100 bord_white H3 bl" href="/invites">Invites</a>
-      </span>
-
-      <span class="W16 b_black left bl">
-        <a class="white W100 bord_white H3 bl" href="/logout">Logout</a>
-      </span>
-    </span>
-
+  <body>
     <%- body %>
 
 
@@ -125,11 +96,5 @@
     <script src="/js/pages/homepage.js"></script>
     <script src="/js/pages/requests.js"></script>
     <!--SCRIPTS END-->
-
-    <script type="text/javascript">
-      $(document).ready(function(){
-        $('#creation').focus();
-      });
-    </script>
   </body>
 </html>

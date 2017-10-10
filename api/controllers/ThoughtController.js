@@ -8,16 +8,17 @@
 module.exports = {
   index: function(req, res) {
 
+    // get all my friendships
     Harmony.find({owner: req.session.userid }).populate('friend').exec(function(err, harmonies) {
       if(err){
         return;
       }
 
-      thought_identities = [];
+      // all identities
+      friend_identities = [];
       for(var i=0; i<harmonies.length; i++){
-        thought_identities.push(harmonies[i].friend_identity);
+        friend_identities.push(harmonies[i].friend_identity);
       }
-
 
       Thought.find({}, function(err, tho) {
         if(err){
@@ -31,18 +32,22 @@ module.exports = {
 
           // is it mine
           thoughts[i].mine = tho[i].identity === req.session.identity;
+          var is_friend = friend_identities.indexOf(tho[i].identity);
 
-          var is_friend = thought_identities.indexOf(tho[i].identity);
+          // console.log(is_friend)
 
-          console.log(harmonies)
 
           if(is_friend>-1){
+            
+            harmonies[is_friend].friend.identity = null;
             thoughts[i].friend = harmonies[is_friend].friend;
           } else {
             thoughts[i].friend = null;
           }
-        }
+          
+          // console.log(thoughts[i])
 
+        }
 
 
         // console.log(thoughts)
@@ -59,8 +64,8 @@ module.exports = {
     var userid = req.session.userid;
     var bee = require('bcrypt');
 
-    console.log(req.session.identity)
-    console.log(req.session.userid)
+    // console.log(req.session.identity)
+    // console.log(req.session.userid)
 
     if(!id || !userid){
       // , {error: 'Missing Identity'}
@@ -91,7 +96,7 @@ module.exports = {
   requests: function(req, res) {
     var userid = req.session.userid;
 
-    console.log(userid)
+    // console.log(userid)
 
     User.findOne({id: userid}, function(err, use) {
       if(err){
@@ -103,7 +108,7 @@ module.exports = {
         return res.clearCookie('authed').redirect('/login');
       }
     
-      console.log(use)
+      // console.log(use)
       Request.find({$or: [{askee: use.id}, {asker: use.id} ]}).populate('asker').populate('askee').populate('thought').exec(function(err, reqqys)  {
         if(err){
           return;
@@ -136,24 +141,31 @@ module.exports = {
         return;
       }
 
-      console.log(reqqy)
+      var new_friend = reqqy.asker;
+      
+      // reproduce new friend's identity
+      var hashme = new_friend.identity + ':' + process.env.IDENTITY_SECRET;
+      var CryptoJS = require('crypto-js');
+      var decrypted_salt = CryptoJS.AES.decrypt(new_friend.identity_salt, process.env.DARKROOM_SECRET).toString(CryptoJS.enc.Utf8);   
 
-      Harmony.create([{owner: reqqy.asker.id, friend: req.session.userid, friend_identity: req.session.identity}, {owner: req.session.userid, friend: reqqy.asker.id, friend_identity: reqqy.thought.identity}]).exec(function(err, harms) {
-        if(err){
-          return;
-        }
+      require('bcrypt').hash(hashme, decrypted_salt, function(err, identhash) {
+        
+        // recreate my hot hash
+        var new_friend_identity = identhash;
 
-        console.log(harms)
+        Harmony.create([{owner: reqqy.asker.id, friend: req.session.userid, friend_identity: req.session.identity }, {owner: req.session.userid, friend: reqqy.asker.id, friend_identity: new_friend_identity}]).exec(function(err, harms) {
+          if(err){
+            return;
+          }
 
-        Request.destroy({$or: [{askee: req.session.userid, asker: reqqy.asker.id}, {askee: reqqy.asker.id, asker: req.session.userid} ]}).populate('asker').populate('askee').populate('thought').exec(function(err, reqdestroy) {
-          console.log('destroyed!')
-          res.redirect('/');
+          Request.destroy({$or: [{askee: req.session.userid, asker: reqqy.asker.id}, {askee: reqqy.asker.id, asker: req.session.userid} ]}).populate('asker').populate('askee').populate('thought').exec(function(err, reqdestroy) {
+            console.log('destroyed!')
+            res.redirect('/');
+          });
+
         });
-
       });
-
     });
-
   },
 
   request: function(req, res) {
@@ -175,35 +187,45 @@ module.exports = {
         var CryptoJS = require('crypto-js');
         var decrypto = CryptoJS.AES.decrypt(tho.mystery, process.env.DARKROOM_SECRET).toString(CryptoJS.enc.Utf8); 
 
-        console.log(decrypto)
-        User.findOne({secret: decrypto}, function(err, user) {
+        // console.log(decrypto)
+        User.findOne({secret: decrypto}, function(err, friend) {
           if(err){
             return;
           }
 
-          if(!user){
+          if(!friend){
             // , {error: 'Missing Identity'}
             return res.clearCookie('authed').redirect('/login');
           }
 
+          Request.count({owner: req.session.userid, thought: tho.id}, function(err, reqcount) {
+            if(err){
+              return;
+            }
+            if(reqcount==0){
 
-          Harmony.count({owner: req.session.userid, friend: friend.id}, function(err, count) {
-            if(count==0){
+              Harmony.count({owner: req.session.userid, friend: friend.id}, function(err, harmcount) {
+                if(harmcount==0){
 
-              Request.create({asker: use.id, askee: friend.id, thought: tho.id}, function(err, reqqy) {
-                console.log(reqqy)
-                if(err){
-                  return res.send(400, "Boo Not Cool");
+                  // only if not already my friend
+                  Request.create({asker: use.id, askee: friend.id, thought: tho.id}, function(err, reqqy) {
+                    if(err){
+                      return res.send(400, "Boo Not Cool");
+                    } else {
+                      return res.send(200, "Cool");
+                    }
+                  });
+
                 } else {
-                  return res.send(200, "Cool");
+                  return res.send(200, "Already Friends!");
                 }
               });
-
             } else {
-              return res.send(200, "Already Friends!");
+              return res.send(200, "Already Requested!");
             }
+            
           });
-          
+         
         });
 
       });
@@ -217,12 +239,13 @@ module.exports = {
         return;
       }
 
+      // console.log(req.session.userid)
       User.findOne({id: req.session.userid}, function(err, use) {
         if(err){
           return;
         }
 
-        console.log(req.body)
+        // console.log(req.body)
 
         tho.rating += (parseInt(req.body.val)*use.dope);
         tho.save();
@@ -242,7 +265,42 @@ module.exports = {
 
       return res.view('harmonies', {harmonies: harms});
     });
-    // check secret... create harmony, destroy request
+  },
+
+  invites: function(req, res) {
+    Invite.find({owner: req.session.userid}, function(err, inv) {
+      if(err){
+        return;
+      }
+
+      return res.view('invites', {invites: inv});
+    });
+  },
+
+  send_invite: function(req, res) {
+    var CryptoJS = require('crypto-js');
+    var email = req.body.email;
+
+    if(!email){
+      return res.redirect('/');
+    }
+
+    Invite.create({owner: req.session.userid, email: email}, function(err, inv) {
+      if(err){
+        return;
+      }
+
+      var tocrypt = inv.email+":"+req.session.id;
+      console.log(tocrypt)
+      console.log(process.env.INVITE_SECRET)
+      var authcode = CryptoJS.AES.encrypt(tocrypt, process.env.INVITE_SECRET).toString(CryptoJS.enc.Utf8);
+
+      // send da email
+      console.log(authcode);
+
+      return res.redirect('/invites');
+    });
   }
+
 };
 

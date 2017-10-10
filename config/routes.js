@@ -34,16 +34,24 @@ module.exports.routes = {
 
   'get /': 'ThoughtController.index',
   'post /create': 'ThoughtController.create',
+  
   'post /rating': 'ThoughtController.rating',
+  
   'post /request': 'ThoughtController.request',
   'get /requests': 'ThoughtController.requests',
   'post /accept': 'ThoughtController.accept',
+
   'get /harmonies': 'ThoughtController.harmonies',
+
+  'get /invites': 'ThoughtController.invites',
+  'post /send_invite': 'ThoughtController.send_invite',
 
 
   'get /login': 'UserController.login',
   'post /auth': 'UserController.auth',
   'get /logout': 'UserController.logout',
+  'get /invited': 'UserController.invited',
+  'post /create': 'UserController.create',
 
 
 

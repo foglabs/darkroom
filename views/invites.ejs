@@ -1,0 +1,28 @@
+<span class="W100 left bl">
+  <span class="W50 left bl">
+    
+    <span class="left bl W100 b_purple white bord_white P2">Send Invite</span>
+    
+    <span class="left bl W100 b_purple white bord_white P2">
+
+      <form id="send_invite" action="/send_invite" method="post">
+        <input type="text" name="email" placeholder="email">
+        <input type="submit" value="Invite">
+      </form>
+
+    </span>
+
+  </span>
+
+  <span class="W50 left bl">
+    
+    <span class="left bl W100 b_purple white bord_white P2">Pending Invitations</span>
+
+    <% for(var i=0; i<invites.length; i++) { %>
+      <span class="b_purple white square left bl bord_white P2">
+        <%= invites[i].email %>
+      </span>
+    <% } %>
+
+  </span>
+</span>
