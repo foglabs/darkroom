@@ -66,10 +66,17 @@ module.exports = {
   invited: function(req, res) {
     var CryptoJS = require('crypto-js');
     
-    var authcode = req.query.au;
-    var authpieces = CryptoJS.AES.decrypt(authcode, process.env.INVITE_SECRET).toString(CryptoJS.enc.Utf8).split(":");
+    var authcode = req.query.auth;
+    console.log(authcode)
+
+    var reb64 = CryptoJS.enc.Hex.parse(authcode);
+    var bytes = reb64.toString(CryptoJS.enc.Base64);
+    var authpieces = CryptoJS.AES.decrypt(bytes, process.env.INVITE_SECRET).toString(CryptoJS.enc.Utf8).split(":");
+    // var authpieces = CryptoJS.AES.decrypt(authcode, process.env.INVITE_SECRET).toString(CryptoJS.enc.Utf8).split(":");
     var email = authpieces[0];
     var ownerid = authpieces[1];
+
+    console.log(authpieces)
 
     if(!email || !ownerid){
       return res.redirect('/');

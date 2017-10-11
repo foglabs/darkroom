@@ -295,31 +295,17 @@ module.exports = {
       }
 
       var tocrypt = inv.email+":"+req.session.userid;
-      var authcode = CryptoJS.AES.encrypt(tocrypt, process.env.INVITE_SECRET).toString();
+      var encrypted = CryptoJS.AES.encrypt(tocrypt, process.env.INVITE_SECRET).toString();
+      var authcode = CryptoJS.enc.Base64.parse(encrypted).toString(CryptoJS.enc.Hex);
 
-      // send da email
+      // // send da email maybe
       // sails.hooks.email.send('/invite_email', {auth: authcode}, {to: email, from: "DARK ROOM", subject: "Come Inside"}, function(no, yes) {
 
       //   console.log("No is "+no)
       //   console.log("Yes is "+yes)
       // });
 
-
-            
-      var sendmail = require('../sendmail')({silent: true})
-
-      sendmail({
-        from: 'test@yourdomain.com',
-        to: 'info@yourdomain.com',
-        replyTo: 'jason@yourdomain.com',
-        subject: 'MailComposer sendmail',
-        html: 'Mail of test sendmail '
-      }, function (err, reply) {
-        console.log(err && err.stack)
-        console.dir(reply)
-      })
-
-      
+      console.log('http://localhost:1337/invited?auth='+authcode)
 
       return res.redirect('/invites');
     });
