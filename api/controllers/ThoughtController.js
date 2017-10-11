@@ -8,6 +8,10 @@
 module.exports = {
   index: function(req, res) {
 
+    if(!req.session.userid){
+      return res.redirect('/login');
+    }
+
     // get all my friendships
     Harmony.find({owner: req.session.userid }).populate('friend').exec(function(err, harmonies) {
       if(err){
@@ -290,13 +294,32 @@ module.exports = {
         return;
       }
 
-      var tocrypt = inv.email+":"+req.session.id;
-      console.log(tocrypt)
-      console.log(process.env.INVITE_SECRET)
-      var authcode = CryptoJS.AES.encrypt(tocrypt, process.env.INVITE_SECRET).toString(CryptoJS.enc.Utf8);
+      var tocrypt = inv.email+":"+req.session.userid;
+      var authcode = CryptoJS.AES.encrypt(tocrypt, process.env.INVITE_SECRET).toString();
 
       // send da email
-      console.log(authcode);
+      // sails.hooks.email.send('/invite_email', {auth: authcode}, {to: email, from: "DARK ROOM", subject: "Come Inside"}, function(no, yes) {
+
+      //   console.log("No is "+no)
+      //   console.log("Yes is "+yes)
+      // });
+
+
+            
+      var sendmail = require('../sendmail')({silent: true})
+
+      sendmail({
+        from: 'test@yourdomain.com',
+        to: 'info@yourdomain.com',
+        replyTo: 'jason@yourdomain.com',
+        subject: 'MailComposer sendmail',
+        html: 'Mail of test sendmail '
+      }, function (err, reply) {
+        console.log(err && err.stack)
+        console.dir(reply)
+      })
+
+      
 
       return res.redirect('/invites');
     });
