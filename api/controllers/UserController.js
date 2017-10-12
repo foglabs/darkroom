@@ -19,7 +19,7 @@ module.exports = {
     if(nm && pw){
 
       User.findOne({name: nm}).exec(function(err, user) {
-        if(err){
+        if(err || !user){
           return res.redirect('/');
         }
 
@@ -77,6 +77,8 @@ module.exports = {
     var ownerid = authpieces[1];
 
     console.log(authpieces)
+    console.log(email)
+    console.log(ownerid)
 
     if(!email || !ownerid){
       return res.redirect('/');
@@ -87,11 +89,13 @@ module.exports = {
         return;
       }
 
+      console.log(inv)
       if(inv){
 
-        var crypted_email = CryptoJS.AES.encrypt(inv.email, process.env.INVITE_SECRET).toString(CryptoJS.enc.Utf8);
+        var crypted_email = CryptoJS.AES.encrypt(inv.email, process.env.INVITE_SECRET).toString();
+        console.log(crypted_email)
 
-        return res.view('creation', {auth: crypted_email});
+        return res.view('creation', {layout: 'login_layout', auth: crypted_email});
       } else {
         return res.redirect('/');
       }
@@ -100,14 +104,17 @@ module.exports = {
   },
 
   create: function(req, res) {
-
+    var CryptoJS = require('crypto-js');
+    var bcrypt = require('bcrypt');
+    
     var auth = req.body.auth;
+    console.log(auth)
 
     if(!auth){
       return res.redirect('/');
     }
 
-    var decrypted_email = CryptoJS.AES.decrypt(auth, process.env.INVITE_SECRET).toString(CryptoJS.enc.Utf8); 
+    var decrypted_email = CryptoJS.AES.decrypt(auth, process.env.INVITE_SECRET).toString(CryptoJS.enc.Utf8);
 
     Invite.findOne({email: decrypted_email}, function(err, inv) {
       if(err){
@@ -116,16 +123,22 @@ module.exports = {
 
       if(inv){
 
+        console.log(inv)
+
         var u = req.body.username;
         var p = req.body.password;
         var s = req.body.secret;
+
+        console.log(u)
+        console.log(p)
+        console.log(s)
 
         if(!u || !p || !s) {
           return res.redirect('/');
         }
 
         // hash pw
-        bcrypt.hash(p, 2, function(err, hash) {
+        bcrypt.hash(p, 2, function(err, hashedpw) {
 
           // gen salt for identity (to reproduce hash later)
           bcrypt.genSalt(2, function(err, salt) {
@@ -140,10 +153,22 @@ module.exports = {
             var ident3 = sodium.api.randombytes_uniform(1000000000).toString(32);
             var ident = ident1+ident2+ident3;
 
+
+
+            console.log("All pieces:")
+            console.log(u)
+            console.log(hashedpw)
+            console.log(s)
+            console.log(ident)
+            console.log(crypted_salt)
+
+
             User.create({name: u, password: hashedpw, secret: s, identity: ident, identity_salt: crypted_salt, dope: 1}, function(err, usr) {
               if(err) {
                 return;
               }
+
+              console.log(usr)
 
               // usr wuz herre, no more inv
               inv.destroy();

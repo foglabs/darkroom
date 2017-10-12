@@ -16,7 +16,13 @@ module.exports.bootstrap = function(cb) {
 
 
   // album
-  Invite.destroy({}, function() {});
+  // Invite.destroy({}, function() {});
+
+
+  Invite.find({}, function(err, inv) {
+    console.log(inv)
+    return;
+  });
 
   if(false){
     Thought.destroy({}).exec(function(){});

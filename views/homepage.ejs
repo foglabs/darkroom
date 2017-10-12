@@ -22,11 +22,16 @@
           <button class="request">?</button>
         <% } %>
 
-        <span class="rating"><%= thoughts[i].rating %></span>
+        <span class="rating">
+          <%= thoughts[i].rating %>
+        </span>
       </span>
 
+      <span class="F10 W96 left bl P2">
+        <%= thoughts[i].createdAt.getUTCFullYear() + '-' + thoughts[i].createdAt.getUTCMonth() + '-' + thoughts[i].createdAt.getUTCDay() %>
+      </span>
     </span>
 
-    <span style="min-height: 0.4em; float: left;"></span>
+
   <% } %>
 </span>

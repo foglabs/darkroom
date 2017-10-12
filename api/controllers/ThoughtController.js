@@ -40,7 +40,6 @@ module.exports = {
 
           // console.log(is_friend)
 
-
           if(is_friend>-1){
             
             harmonies[is_friend].friend.identity = null;
@@ -61,7 +60,7 @@ module.exports = {
 
   },
 
-  create: function(req, res) {
+  say: function(req, res) {
 
     var bo = req.body.bo;
     var id = req.session.identity;
@@ -278,6 +277,17 @@ module.exports = {
       }
 
       return res.view('invites', {invites: inv});
+    });
+  },
+
+
+  noinvite: function(req, res) {
+    Invite.destroy({id: req.body.inv_id}, function(err, inv) {
+      if(err){
+        return;
+      }
+
+      return res.send(200, 'Yay');
     });
   },
 

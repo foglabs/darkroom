@@ -33,7 +33,7 @@ module.exports.routes = {
   ***************************************************************************/
 
   'get /': 'ThoughtController.index',
-  'post /create': 'ThoughtController.create',
+  'post /say': 'ThoughtController.say',
   
   'post /rating': 'ThoughtController.rating',
   
@@ -44,6 +44,7 @@ module.exports.routes = {
   'get /harmonies': 'ThoughtController.harmonies',
 
   'get /invites': 'ThoughtController.invites',
+  'post /noinvite': 'ThoughtController.noinvite',
   'post /send_invite': 'ThoughtController.send_invite',
 
 
