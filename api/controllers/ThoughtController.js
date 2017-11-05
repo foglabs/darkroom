@@ -19,7 +19,7 @@ module.exports = {
       }
 
       // all identities
-      friend_identities = [];
+      var friend_identities = [];
       for(var i=0; i<harmonies.length; i++){
         friend_identities.push(harmonies[i].friend_identity);
       }
@@ -48,8 +48,9 @@ module.exports = {
             thoughts[i].friend = null;
           }
           
-          // console.log(thoughts[i])
+          thoughts[i].datestring = tho[i].createdAt.getUTCFullYear() + '-' + tho[i].createdAt.getUTCMonth() + '-' + tho[i].createdAt.getUTCDay();
 
+          // console.log(thoughts[i])
         }
 
 
@@ -89,12 +90,75 @@ module.exports = {
             if(err){
               return;
             }
-        });  
+
+            sails.sockets.broadcast("newposts", "a_new_post", tho.id);
+        });
       });
     }
     
     return res.redirect('/');
   },
+
+///////// show dat client some shit
+
+  get_new_posts: function(req, res) {
+    if (!req.isSocket) {return res.badRequest();}
+    
+    sails.sockets.join(req.socket, "newposts");
+    // sails.sockets.broadcast("newposts", "a_new_post", data);
+    return;
+  },
+
+  get_post_details: function(req, res) {
+    
+    var postid = req.body.postid;
+    var userid = req.session.userid;
+    // var userid = req.body.userid;
+
+    Harmony.find({owner: userid }).populate('friend').exec(function(err, harmonies) {
+      if(err){
+        return;
+      }
+
+      User.findOne({id: userid}, function(err, use) {
+        if(err){
+          return;
+        }
+
+        Thought.findOne({id: postid}, function(err, tho) {
+          if(err){
+            return;
+          }
+
+          var friend_identities = [];
+          for(var i=0; i<harmonies.length; i++){
+            friend_identities.push(harmonies[i].friend_identity);
+          }
+
+          var newthought = tho;
+
+          // is it mine
+          newthought.mine = tho.identity === req.session.identity;
+          var is_friend = friend_identities.indexOf(tho.identity);
+
+          if(is_friend>-1){
+            
+            harmonies[is_friend].friend.identity = null;
+            newthought.friend = harmonies[is_friend].friend;
+          } else {
+            newthought.friend = null;
+          }
+
+          newthought.datestring = tho.createdAt.getUTCFullYear() + '-' + tho.createdAt.getUTCMonth() + '-' + tho.createdAt.getUTCDay();
+          
+          return res.send(200, newthought);
+        });
+
+      });
+    });
+
+  },
+
 
   requests: function(req, res) {
     var userid = req.session.userid;
@@ -269,6 +333,8 @@ module.exports = {
       return res.view('harmonies', {harmonies: harms});
     });
   },
+
+////// invites!
 
   invites: function(req, res) {
     Invite.find({owner: req.session.userid}, function(err, inv) {

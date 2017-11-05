@@ -35,6 +35,9 @@ module.exports.routes = {
   'get /': 'ThoughtController.index',
   'post /say': 'ThoughtController.say',
   
+  'post /details': 'ThoughtController.get_post_details',
+  'get /newposts': 'ThoughtController.get_new_posts',
+
   'post /rating': 'ThoughtController.rating',
   
   'post /request': 'ThoughtController.request',
