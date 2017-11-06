@@ -24,7 +24,7 @@ module.exports = {
         friend_identities.push(harmonies[i].friend_identity);
       }
 
-      Thought.find({}, function(err, tho) {
+      Thought.find({}).sort('createdAt DESC').exec(function(err, tho) {
         if(err){
           return;
         }

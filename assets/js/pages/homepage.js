@@ -16,7 +16,7 @@ $(document).ready(function() {
     $.post('/details', {postid: post_id}, function(thot) {
       var tho = thot;
 
-      var tho_span = $(document.createElement('span')).attr('id', tho.id).addClass('bl b_purple square bord_white white left');
+      var tho_span = $(document.createElement('span')).attr('id', tho.id).addClass('hidden bl b_purple square bord_white white left');
 
       var tho_row_name = $(document.createElement('span')).addClass('W96 left bl b_black P2 white');
       
@@ -54,7 +54,10 @@ $(document).ready(function() {
       tho_span.append( tho_row_buttons );  
       tho_span.append( tho_row_date ); 
 
-      $('#message_cont').append(tho_span); 
+      $('#message_cont').prepend(tho_span);
+
+      // $('#'+tho.id).addClass('shown').removeClass('hidden');
+      $('#'+tho.id).animate({opacity: 1}, 1000);
     });
     
   });
