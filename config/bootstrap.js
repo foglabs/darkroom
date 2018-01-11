@@ -15,15 +15,12 @@ module.exports.bootstrap = function(cb) {
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
 
 
-  // album
-  // Invite.destroy({}, function() {});
+  // fake - these would normally just be environment variables
+  process.env.DARKROOM_SECRET="123456";
+  process.env.IDENTITY_SECRET="7890123";
+  process.env.INVITE_SECRET="098765432";
 
-
-  Invite.find({}, function(err, inv) {
-    console.log(inv)
-    return;
-  });
-
+  // clear db/seed user if true
   if(false){
     Thought.destroy({}).exec(function(){});
     User.destroy({}).exec(function(){});
@@ -31,7 +28,7 @@ module.exports.bootstrap = function(cb) {
     var bcrypt = require('bcrypt');
 
     // generate password hash
-    bcrypt.hash('bigolbutt', 2, function(err, hash) {
+    bcrypt.hash('whatapassword', 2, function(err, hash) {
 
       // bcrypt.genSalt(10, function(err, salt) {
       //     bcrypt.hash("", salt, function(err, hash) {

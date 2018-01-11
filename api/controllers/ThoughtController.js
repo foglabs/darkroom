@@ -99,7 +99,7 @@ module.exports = {
     return res.redirect('/');
   },
 
-///////// show dat client some shit
+///////// show the client some stuff
 
   get_new_posts: function(req, res) {
     if (!req.isSocket) {return res.badRequest();}
